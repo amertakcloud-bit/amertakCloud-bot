@@ -8,7 +8,7 @@ const BOT_TOKEN = process.env.BOT_TOKEN;
 if (!BOT_TOKEN) throw new Error("Missing BOT_TOKEN");
 
 const MAX_SECONDS = parseInt(process.env.MAX_SECONDS || "600", 10); // 10 min
-const EXTRA = (process.env.YTDLP_EXTRA_ARGS || "--js-runtimes node").split(" ").filter(Boolean);
+const EXTRA = (process.env.YTDLP_EXTRA_ARGS || "--js-runtimes node --remote-components ejs:github").split(" ").filter(Boolean);
 
 // ---------- Cache (Upstash Redis, fallback to memory) ----------
 const redis = process.env.UPSTASH_REDIS_REST_URL
@@ -64,7 +64,7 @@ function search(query) {
 // ---------- Download: yt-dlp -> ffmpeg -> Buffer (no files) ----------
 function downloadMp3(id) {
   return new Promise((resolve, reject) => {
-    const y = spawn("yt-dlp", [...baseArgs, "-f", "bestaudio", "--no-playlist", "-q", "-o", "-", `https://www.youtube.com/watch?v=${id}`]);
+    const y = spawn("yt-dlp", [...baseArgs, "-f", "bestaudio/best", "--no-playlist", "-q", "-o", "-", `https://www.youtube.com/watch?v=${id}`]);
     const f = spawn("ffmpeg", ["-loglevel", "error", "-i", "pipe:0", "-vn", "-b:a", "128k", "-f", "mp3", "pipe:1"]);
     const chunks = [];
     let err = "";
