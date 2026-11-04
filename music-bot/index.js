@@ -8,7 +8,7 @@ const BOT_TOKEN = process.env.BOT_TOKEN;
 if (!BOT_TOKEN) throw new Error("Missing BOT_TOKEN");
 
 const MAX_SECONDS = parseInt(process.env.MAX_SECONDS || "600", 10); // 10 min
-const EXTRA = (process.env.YTDLP_EXTRA_ARGS || "--js-runtimes node --remote-components ejs:github").split(" ").filter(Boolean);
+const EXTRA = (process.env.YTDLP_EXTRA_ARGS || "--js-runtimes node").split(" ").filter(Boolean);
 
 // ---------- Cache (Upstash Redis, fallback to memory) ----------
 const redis = process.env.UPSTASH_REDIS_REST_URL
