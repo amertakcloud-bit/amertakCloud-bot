@@ -154,5 +154,25 @@ http
   })
   .listen(process.env.PORT || 3000);
 
-bot.start({ drop_pending_updates: true });
-console.log("Bot started");
+async function launch() {
+  while (true) {
+    try {
+      console.log("Bot starting...");
+      await bot.start({ drop_pending_updates: true });
+      return;
+    } catch (e) {
+      if (e.error_code === 409) {
+        console.log("409 conflict (instance ចាស់នៅដំណើរការ) - retry in 10s...");
+        await new Promise((r) => setTimeout(r, 10000));
+        continue;
+      }
+      console.error("Fatal:", e);
+      process.exit(1);
+    }
+  }
+}
+launch();
+
+// បិទ polling ឱ្យស្អាតពេល Render ឈប់ instance ចាស់
+process.once("SIGTERM", () => bot.stop());
+process.once("SIGINT", () => bot.stop());
