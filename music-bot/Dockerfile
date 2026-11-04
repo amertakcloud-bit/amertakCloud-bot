@@ -1,19 +1,16 @@
 FROM node:20-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-ffmpeg python3 curl ca-certificates \
+ffmpeg python3 curl ca-certificates unzip \
 && rm -rf /var/lib/apt/lists/*
 
-# Change this number to force Render to re-download yt-dlp
-ARG CACHEBUST=1
-RUN echo "cachebust=$CACHEBUST" \
-&& curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
-&& chmod a+rx /usr/local/bin/yt-dlp \
-&& yt-dlp --version
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
+&& chmod a+rx /usr/local/bin/yt-dlp
 
 WORKDIR /app
 COPY package.json ./
 RUN npm install --omit=dev
 COPY . .
 
-CMD ["node", "index.js"]
+# update yt-dlp រាល់ពេលចាប់ផ្តើម, បោះពុម្ព version ក្នុង log
+CMD ["sh", "-c", "yt-dlp -U; yt-dlp --version; node index.js"]
